@@ -1,0 +1,4 @@
+#+TITLE: Space Cubics OBC OpenOCD Testing Environment
+#+PROPERTY: header-args:emacs-lisp :results silent
+
+This is an environment for testing the Space Cubics OBC using OpenOCD.
