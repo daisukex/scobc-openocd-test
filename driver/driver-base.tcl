@@ -19,3 +19,12 @@ proc peak32 { addr } {
 proc splitdata { data byte } {
     return [expr ($data >> ($byte * 8)) & 0xFF]
 }
+
+proc str2asc { str } {
+    set len [string length $str]
+    for {set i 0} {$i < $len} {incr i} {
+        scan [string range $str $i $i] "%c" asc
+        lappend data [format "0x%x" $asc]
+    }
+    return $data
+}
