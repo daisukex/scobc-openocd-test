@@ -28,3 +28,16 @@ proc str2asc { str } {
     }
     return $data
 }
+
+proc hex2asc { hex } {
+    set len [llength $hex]
+    set data ""
+    if { $len > 0 } {
+        for {set i 0} {$i < $len} {incr i} {
+            set char [lindex $hex $i]
+            append data [format "%c" $char]
+        }
+        return $data
+    }
+    return ""
+}
