@@ -57,10 +57,14 @@ proc uartl_send { base text } {
 proc uartl_receive { base } {
     global uartl_rxfifor
 
-    while { [__uartl_chk_rxfifo_notempty $base] } {
-        lappend data [peak08 [expr $base | $uartl_rxfifor]]
+    if {[__uartl_chk_rxfifo_notempty $base]} {
+        while { [__uartl_chk_rxfifo_notempty $base] } {
+            lappend data [peak08 [expr $base | $uartl_rxfifor]]
+        }
+        puts "UART Receive Data: $data"
+    } else {
+        puts "UART Receive Data: FIFO Empty (No Data)"
     }
-    puts "UART Receive Data: $data"
 }
 
 proc uartl_get_status { base } {
