@@ -25,6 +25,29 @@ proc __uartl_chk_rxfifo_notempty { base } {
     return [expr [peak08 [expr $base | $uartl_statr]] & $empbit]
 }
 
+proc __uartl_send { base text } {
+    global uartl_txfifor
+
+    set byte [llength $text]
+    for {set i 0} {$i < $byte} {incr i} {
+        while { [__uartl_chk_txfifo_full $base] } {}
+        mww [expr $base | $uartl_txfifor] [lindex $text $i]
+    }
+}
+
+proc __uartl_receive { base } {
+    global uartl_rxfifor
+
+    if {[__uartl_chk_rxfifo_notempty $base]} {
+        while { [__uartl_chk_rxfifo_notempty $base] } {
+            lappend data [peak08 [expr $base | $uartl_rxfifor]]
+        }
+        return $data
+    } else {
+        return ""
+    }
+}
+
 proc uartl_init { base sysclk bardrate } {
     global uartl_ver
     set data [peak32 [expr $base | $uartl_ver]]
@@ -44,27 +67,25 @@ proc uartl_set_baudrate { base sysclk baudrate } {
 }
 
 proc uartl_send { base text } {
-    global uartl_txfifor
-
-    set byte [llength $text]
-    for {set i 0} {$i < $byte} {incr i} {
-        while { [__uartl_chk_txfifo_full $base] } {}
-        mww [expr $base | $uartl_txfifor] [lindex $text $i]
-    }
+    __uartl_send $base $text
     puts "UART Send Data   : $text"
 }
 
-proc uartl_receive { base } {
-    global uartl_rxfifor
+proc uartl_send_no_display { base text } {
+    __uartl_send $base $text
+}
 
-    if {[__uartl_chk_rxfifo_notempty $base]} {
-        while { [__uartl_chk_rxfifo_notempty $base] } {
-            lappend data [peak08 [expr $base | $uartl_rxfifor]]
-        }
-        puts "UART Receive Data: $data"
-    } else {
+proc uartl_receive { base } {
+    set data [__uartl_receive $base]
+    if {$data == ""} {
         puts "UART Receive Data: FIFO Empty (No Data)"
+    } else {
+        puts "UART Receive Data: $data"
     }
+}
+
+proc uartl_receive_ret_data { base } {
+    return [__uartl_receive $base]
 }
 
 proc uartl_get_status { base } {
