@@ -27,7 +27,7 @@ source driver/driver-base.tcl
 proc i2c_enable { base } {
     global i2cm_enr
     global debug
-    mww [expr $base | $i2cm_enr] 1
+    mww [expr {$base | $i2cm_enr}] 1
     if {$debug} {
         puts "I2C Master Enable: [peak32 [expr $base | $i2cm_enr]]"
     }
@@ -36,7 +36,7 @@ proc i2c_enable { base } {
 proc i2c_disable { base } {
     global i2cm_enr
     global debug
-    mww [expr $base | $i2cm_enr] 0
+    mww [expr {$base | $i2cm_enr}] 0
     if {$debug} {
         puts "I2C Master Enable: [peak32 [expr $base | $i2cm_enr]]"
     }
@@ -51,13 +51,13 @@ proc set_i2c_format_100kbps { base } {
     global i2cm_tsudatr
     global i2cm_tbufr
 
-    mww [expr $base | $i2cm_thdstar] 0x00EF
-    mww [expr $base | $i2cm_tsustor] 0x00EF
-    mww [expr $base | $i2cm_tsustar] 0x0117
-    mww [expr $base | $i2cm_thighr]  0x00E5
-    mww [expr $base | $i2cm_thddatr] 0x0013
-    mww [expr $base | $i2cm_tsudatr] 0x00E5
-    mww [expr $base | $i2cm_tbufr]   0x0117
+    mww [expr {$base | $i2cm_thdstar}] 0x00EF
+    mww [expr {$base | $i2cm_tsustor}] 0x00EF
+    mww [expr {$base | $i2cm_tsustar}] 0x0117
+    mww [expr {$base | $i2cm_thighr}]  0x00E5
+    mww [expr {$base | $i2cm_thddatr}] 0x0013
+    mww [expr {$base | $i2cm_tsudatr}] 0x00E5
+    mww [expr {$base | $i2cm_tbufr}]   0x0117
 }
 
 proc i2c_init { base } {
@@ -73,13 +73,13 @@ proc i2c_read { base i2c_addr reg_addr byte} {
     set b_read       0x1
     set data         0x0
 
-    set byte [expr $byte - 1]
-    mww [expr $base | $i2cm_txfifor] [expr $i2c_addr << 1]
-    mww [expr $base | $i2cm_txfifor] [expr $b_restart | $reg_addr]
-    mww [expr $base | $i2cm_txfifor] [expr ($i2c_addr << 1) | $b_read]
-    mww [expr $base | $i2cm_txfifor] [expr $b_stop | $byte]
+    set byte [expr {$byte - 1}]
+    mww [expr {$base | $i2cm_txfifor}] [expr {$i2c_addr << 1}]
+    mww [expr {$base | $i2cm_txfifor}] [expr {$b_restart | $reg_addr}]
+    mww [expr {$base | $i2cm_txfifor}] [expr {($i2c_addr << 1) | $b_read}]
+    mww [expr {$base | $i2cm_txfifor}] [expr {$b_stop | $byte}]
     for {set i $byte } {$i >= 0} {incr i -1} {
-        set data [expr $data | ([peak08 [expr $base | $i2cm_rxfifor]] << ($i * 8))]
+        set data [expr {$data | ([peak08 [expr {$base | $i2cm_rxfifor}]] << ($i * 8))}]
     }
     puts [format "I2C Read Data : 0x%x" $data ]
 }
@@ -93,15 +93,15 @@ proc i2c_write  { base i2c_addr reg_addr byte data } {
     set byte1          0
     set byte0          0
 
-    mww [expr $base | $i2cm_txfifor] [expr $i2c_addr << 1]
-    mww [expr $base | $i2cm_txfifor] [expr $reg_addr]
+    mww [expr {$base | $i2cm_txfifor}] [expr {$i2c_addr << 1}]
+    mww [expr {$base | $i2cm_txfifor}] [expr {$reg_addr}]
 
-    set byte [expr $byte - 1]
+    set byte [expr {$byte - 1}]
     if { $byte > 0 } {
         for {set i $byte} {$i > 0} {incr i -1} {
-            mww [expr $base | $i2cm_txfifor] [splitdata $data $i]
+            mww [expr {$base | $i2cm_txfifor}] [splitdata $data $i]
         }
     }
-    mww [expr $base | $i2cm_txfifor] [expr $b_stop | [splitdata $data 0]]
+    mww [expr {$base | $i2cm_txfifor}] [expr {$b_stop | [splitdata $data 0]}]
     puts "I2C Write Data: $data"
 }

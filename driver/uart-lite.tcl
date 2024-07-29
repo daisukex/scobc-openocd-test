@@ -15,14 +15,14 @@ proc __uartl_chk_txfifo_full { base } {
     global uartl_statr
     set fullbit 0x08
 
-    return [expr [peak08 [expr $base | $uartl_statr]] & $fullbit]
+    return [expr {[peak08 [expr {$base | $uartl_statr]}] & $fullbit}]
 }
 
 proc __uartl_chk_rxfifo_notempty { base } {
     global uartl_statr
     set empbit 0x01
 
-    return [expr [peak08 [expr $base | $uartl_statr]] & $empbit]
+    return [expr {[peak08 [expr {$base | $uartl_statr}]] & $empbit}]
 }
 
 proc __uartl_send { base text } {
@@ -31,7 +31,7 @@ proc __uartl_send { base text } {
     set byte [llength $text]
     for {set i 0} {$i < $byte} {incr i} {
         while { [__uartl_chk_txfifo_full $base] } {}
-        mww [expr $base | $uartl_txfifor] [lindex $text $i]
+        mww [expr {$base | $uartl_txfifor}] [lindex $text $i]
     }
 }
 
@@ -40,7 +40,7 @@ proc __uartl_receive { base } {
 
     if {[__uartl_chk_rxfifo_notempty $base]} {
         while { [__uartl_chk_rxfifo_notempty $base] } {
-            lappend data [peak08 [expr $base | $uartl_rxfifor]]
+            lappend data [peak08 [expr {$base | $uartl_rxfifor}]]
         }
         return $data
     } else {
@@ -50,7 +50,7 @@ proc __uartl_receive { base } {
 
 proc uartl_init { base sysclk bardrate } {
     global uartl_ver
-    set data [peak32 [expr $base | $uartl_ver]]
+    set data [peak32 [expr {$base | $uartl_ver}]]
     puts "Space Cubics UART-Lite (sc-uartlit)"
     puts " Version: $data"
     uartl_set_baudrate $base $sysclk $bardrate
@@ -59,9 +59,9 @@ proc uartl_init { base sysclk bardrate } {
 proc uartl_set_baudrate { base sysclk baudrate } {
     global uartl_ubrsr
 
-    set freqs [expr ($sysclk * 1000000) / $baudrate]
-    set data [expr round($freqs) - 1]
-    mww [expr $base | $uartl_ubrsr] $data
+    set freqs [expr {($sysclk * 1000000) / $baudrate}]
+    set data [expr {round($freqs) - 1}]
+    mww [expr {$base | $uartl_ubrsr}] $data
     puts "UART-Lite"
     puts [format "Set Boardrate : $baudrate (0x%x)" $data]
 }
@@ -91,6 +91,6 @@ proc uartl_receive_ret_data { base } {
 proc uartl_get_status { base } {
     global uartl_statr
 
-    set status [peak32 [expr $base | $uartl_statr]]
+    set status [peak32 [expr {$base | $uartl_statr}]]
     puts "UART Lite Status : $status"
 }
