@@ -41,3 +41,32 @@ proc hex2asc { hex } {
     }
     return ""
 }
+
+proc __access_type { width } {
+    if { $width == 32 } {
+        return "WORD"
+    } else if { $width == 16 } {
+        return "HWORD"
+    } else if { $width == 8 } {
+        return "BYTE"
+    } else {
+        return ""
+    }
+}
+
+proc poke { addr width data } {
+    global regdebug
+    if {$regdebug == 1} {
+        puts [format "WR %-5s %#08x %#08x" [__access_type $width] $addr $data]
+    }
+    write_memory $addr $width $data
+}
+
+proc peak { addr width } {
+    global regdebug
+    set rd [read_memory $addr $width 1]
+    if {$regdebug == 1} {
+        puts [format "RD %-5s %#08x %#08x" [__access_type $width] $addr $rd ]
+    }
+    return $rd
+}
