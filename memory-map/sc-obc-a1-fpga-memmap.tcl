@@ -9,3 +9,4 @@ set uartlite_base       0x4F010000
 set ext_i2c_base        0x4F030000
 set sysmon_base         0x4F040000
 set gpt_base            0x4F050000
+set cfgreg_base         0x4F0F0000
